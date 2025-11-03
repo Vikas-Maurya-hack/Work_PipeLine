@@ -71,7 +71,7 @@ const validateColumn = (value: any, column: typeof REQUIRED_COLUMNS[0]): { valid
 };
 
 // Save to fixed Excel file location
-export const saveToExcel = async (leads: Lead[]) => {
+export const exportToExcel = async (leads: Lead[]) => {
   await ensureDataDirectory();
   const wb = XLSX.utils.book_new();
   
@@ -125,7 +125,7 @@ export const saveToExcel = async (leads: Lead[]) => {
 };
 
 // Load from fixed Excel file location
-export const loadFromExcel = async (): Promise<Lead[]> => {
+export const importFromExcel = async (file?: File): Promise<Lead[]> => {
   await ensureDataDirectory();
   
   try {
