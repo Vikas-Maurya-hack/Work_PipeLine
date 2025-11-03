@@ -18,7 +18,8 @@ const Index = () => {
   } = useLeads();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-top bg-fixed">
+      <div className="min-h-screen bg-white/50 dark:bg-black/50 backdrop-blur-[2px]">
       <Header
         onAddLead={() => setIsDialogOpen(true)}
         searchQuery={searchQuery}
@@ -52,6 +53,7 @@ const Index = () => {
         onOpenChange={setIsDialogOpen}
         onSubmit={addLead}
       />
+      </div>
     </div>
   );
 };
