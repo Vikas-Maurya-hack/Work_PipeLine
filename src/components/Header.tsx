@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Download, Upload, FileDown } from "lucide-react";
+import { exportToExcel, importFromExcel, downloadTemplate } from "@/lib/excel";
+import { Lead } from "@/types/lead";
+import { useRef } from "react";
 
 interface HeaderProps {
   onAddLead: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  leads: Lead[];
+  onImportLeads: (leads: Lead[]) => void;
 }
 
-export const Header = ({ onAddLead, searchQuery, onSearchChange }: HeaderProps) => {
+export const Header = ({ onAddLead, searchQuery, onSearchChange, leads, onImportLeads }: HeaderProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4">
@@ -35,13 +41,58 @@ export const Header = ({ onAddLead, searchQuery, onSearchChange }: HeaderProps) 
             </div>
           </div>
           
-          <Button 
-            onClick={onAddLead}
-            className="bg-primary hover:bg-primary-dark text-primary-foreground gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Lead</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".xlsx,.xls"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  try {
+                    const importedLeads = await importFromExcel(file);
+                    onImportLeads(importedLeads);
+                  } catch (error) {
+                    console.error('Failed to import Excel:', error);
+                  }
+                }
+                // Clear the input so the same file can be selected again
+                e.target.value = '';
+              }}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => downloadTemplate()}
+              title="Download Template"
+            >
+              <FileDown className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+              title="Import from Excel"
+            >
+              <Upload className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => exportToExcel(leads)}
+              title="Export to Excel"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+            <Button 
+              onClick={onAddLead}
+              className="bg-primary hover:bg-primary-dark text-primary-foreground gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Add Lead</span>
+            </Button>
+          </div>
         </div>
       </div>
     </header>

@@ -1,73 +1,141 @@
-# Welcome to your Lovable project
+# Work Pipeline - Lead Management System
 
-## Project info
+A comprehensive lead management system built with modern web technologies, featuring data visualization, Excel integration, and an intuitive pipeline board interface.
 
-**URL**: https://lovable.dev/projects/d5b10a30-50e8-4227-9d37-3dc0b7d20bfb
+## Features
 
-## How can I edit this code?
+- 📊 Interactive Dashboard with Visualizations
+- 📈 Performance Graphs and Pie Charts
+- 📋 Kanban-style Pipeline Board
+- 📁 Excel Data Integration
+- 🔄 Automatic Data Backup System
+- ✨ Modern UI with shadcn/ui Components
 
-There are several ways of editing your application.
+## Technologies Used
 
-**Use Lovable**
+- React + TypeScript
+- Vite for Build Tooling
+- Tailwind CSS for Styling
+- shadcn/ui for UI Components
+- XLSX for Excel Integration
+- Recharts for Data Visualization
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d5b10a30-50e8-4227-9d37-3dc0b7d20bfb) and start prompting.
+## Data Storage
 
-Changes made via Lovable will be committed automatically to this repo.
+The application uses a fixed Excel file system for data persistence:
 
-**Use your preferred IDE**
+### File Locations
+- **Main Database**: 
+  - Windows: `%APPDATA%\work-pipeline\leads_database.xlsx`
+  - macOS: `~/Library/Preferences/work-pipeline/leads_database.xlsx`
+  - Linux: `~/.local/share/work-pipeline/leads_database.xlsx`
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backup System
+- Automatic backups are created daily
+- Backup Location: `[APP_DATA_PATH]/work-pipeline/backups/`
+- Format: `leads-YYYY-MM-DD.xlsx`
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/Vikas-Maurya-hack/Work_PipeLine.git
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies:
+   ```sh
+   cd Work_PipeLine
+   npm install
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Start the development server:
+   ```sh
+   npm run dev
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Project Structure
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+work-pipeline/
+├── src/
+│   ├── components/        # UI Components
+│   │   ├── Dashboard.tsx  # Main dashboard
+│   │   ├── PipelineBoard.tsx
+│   │   └── ui/           # shadcn/ui components
+│   ├── lib/
+│   │   ├── excel.ts      # Excel integration
+│   │   └── utils.ts      # Utility functions
+│   ├── hooks/            # Custom React hooks
+│   └── types/            # TypeScript type definitions
+└── public/              # Static assets
 ```
 
-**Edit a file directly in GitHub**
+## Data Management
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Excel Integration
+- Automatic saving to fixed location
+- Daily backups
+- Data validation on import/export
+- Template generation for new data
 
-**Use GitHub Codespaces**
+### Required Data Fields
+- ID (string)
+- Title (string)
+- Client (string)
+- Value (number)
+- Date (date)
+- Status (enum: new, contacted, qualified, proposal, won)
+- Priority (enum: high, medium, low)
+- Description (string, optional)
+- Email (string, optional)
+- Phone (string, optional)
+- Created At (date)
+- Updated At (date)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Development
 
-## What technologies are used for this project?
+### Running Locally
 
-This project is built with:
+1. Install dependencies:
+   ```sh
+   npm install
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2. Start development server:
+   ```sh
+   npm run dev
+   ```
 
-## How can I deploy this project?
+3. Build for production:
+   ```sh
+   npm run build
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/d5b10a30-50e8-4227-9d37-3dc0b7d20bfb) and click on Share -> Publish.
+### Updating GitHub Repository
 
-## Can I connect a custom domain to my Lovable project?
+1. Stage your changes:
+   ```sh
+   git add .
+   ```
 
-Yes, you can!
+2. Commit changes:
+   ```sh
+   git commit -m "Your commit message"
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+3. Push to GitHub:
+   ```sh
+   git push origin master
+   ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -m 'Add some feature'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details

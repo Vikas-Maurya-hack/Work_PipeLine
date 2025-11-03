@@ -23,6 +23,10 @@ const Index = () => {
         onAddLead={() => setIsDialogOpen(true)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        leads={allLeads}
+        onImportLeads={(importedLeads) => {
+          importedLeads.forEach(lead => addLead(lead));
+        }}
       />
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
@@ -32,7 +36,7 @@ const Index = () => {
   <Dashboard leads={leads} />
         
         <div className="mt-12 mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Sales Pipeline</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Sales</h2>
           <p className="text-muted-foreground">Drag and drop leads between stages to update their status</p>
         </div>
         <PipelineBoard

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Lead, LeadStatus } from "@/types/lead";
 import { loadLeads, saveLeads } from "@/lib/storage";
+import { exportToExcel } from "@/lib/excel";
 import { toast } from "sonner";
 
 export const useLeads = () => {
@@ -14,13 +15,26 @@ export const useLeads = () => {
   useEffect(() => {
     if (leads.length > 0) {
       saveLeads(leads);
+      // Check for auto-backup
+      const lastBackup = localStorage.getItem('lastBackupDate');
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Create backup if we haven't backed up today
+      if (lastBackup !== today) {
+        exportToExcel(leads, true);
+        localStorage.setItem('lastBackupDate', today);
+        toast.success('Daily backup created successfully');
+      }
     }
   }, [leads]);
 
-  const addLead = (lead: Omit<Lead, "id">) => {
+  const addLead = (lead: Omit<Lead, "id" | "createdAt" | "updatedAt">) => {
+    const now = new Date().toISOString();
     const newLead: Lead = {
       ...lead,
       id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
     };
     setLeads((prev) => [newLead, ...prev]);
     toast.success("Lead added successfully!");
@@ -29,7 +43,7 @@ export const useLeads = () => {
 
   const updateLead = (id: string, updates: Partial<Lead>) => {
     setLeads((prev) =>
-      prev.map((lead) => (lead.id === id ? { ...lead, ...updates } : lead))
+      prev.map((lead) => (lead.id === id ? { ...lead, ...updates, updatedAt: new Date().toISOString() } : lead))
     );
     toast.success("Lead updated!");
   };
