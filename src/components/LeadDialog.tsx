@@ -1,0 +1,202 @@
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Lead, LeadPriority, LeadStatus } from "@/types/lead";
+
+interface LeadDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (lead: Omit<Lead, "id">) => void;
+  lead?: Lead;
+}
+
+export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogProps) => {
+  const [formData, setFormData] = useState<Omit<Lead, "id">>({
+    title: lead?.title || "",
+    client: lead?.client || "",
+    value: lead?.value || 0,
+    date: lead?.date || new Date().toISOString().split("T")[0],
+    status: lead?.status || "new",
+    priority: lead?.priority || "medium",
+    description: lead?.description || "",
+    email: lead?.email || "",
+    phone: lead?.phone || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+    onOpenChange(false);
+    setFormData({
+      title: "",
+      client: "",
+      value: 0,
+      date: new Date().toISOString().split("T")[0],
+      status: "new",
+      priority: "medium",
+      description: "",
+      email: "",
+      phone: "",
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{lead ? "Edit Lead" : "Add New Lead"}</DialogTitle>
+          <DialogDescription>
+            Fill in the details for the lead. All fields marked with * are required.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Project Title *</Label>
+              <Input
+                id="title"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Website Redesign"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="client">Client Name *</Label>
+              <Input
+                id="client"
+                required
+                value={formData.client}
+                onChange={(e) => setFormData({ ...formData, client: e.target.value })}
+                placeholder="Acme Corp"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="contact@client.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="value">Deal Value ($) *</Label>
+              <Input
+                id="value"
+                type="number"
+                required
+                min="0"
+                value={formData.value}
+                onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
+                placeholder="15000"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="status">Status *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: LeadStatus) =>
+                  setFormData({ ...formData, status: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="contacted">Contacted</SelectItem>
+                  <SelectItem value="qualified">Qualified</SelectItem>
+                  <SelectItem value="proposal">Proposal</SelectItem>
+                  <SelectItem value="won">Won</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="priority">Priority *</Label>
+              <Select
+                value={formData.priority}
+                onValueChange={(value: LeadPriority) =>
+                  setFormData({ ...formData, priority: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="date">Date *</Label>
+            <Input
+              id="date"
+              type="date"
+              required
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Additional details about the project..."
+              rows={4}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-primary hover:bg-primary-dark">
+              {lead ? "Update Lead" : "Add Lead"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
