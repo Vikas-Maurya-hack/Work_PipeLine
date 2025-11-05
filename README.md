@@ -1,141 +1,257 @@
-# Work Pipeline - Lead Management System
+# Work Pipeline - Lead Management System 🚀
 
-A comprehensive lead management system built with modern web technologies, featuring data visualization, Excel integration, and an intuitive pipeline board interface.
+A powerful **Electron Desktop Application** for managing sales leads with automatic Excel file storage, real-time data visualization, and an intuitive drag-and-drop pipeline interface.
 
-## Features
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
 
-- 📊 Interactive Dashboard with Visualizations
-- 📈 Performance Graphs and Pie Charts
-- 📋 Kanban-style Pipeline Board
-- 📁 Excel Data Integration
-- 🔄 Automatic Data Backup System
-- ✨ Modern UI with shadcn/ui Components
+## ✨ Features
 
-## Technologies Used
+### 🎯 Lead Management
+- **Drag & Drop Pipeline Board** - Visual Kanban-style board with 5 stages (New, Contacted, Qualified, Proposal, Won)
+- **Create, Edit & Delete Leads** - Full CRUD operations with form validation
+- **Advanced Search** - Multi-field search across title, client, email, description, and phone
+- **Smart Filtering** - Real-time search with highlighted matches
 
-- React + TypeScript
-- Vite for Build Tooling
-- Tailwind CSS for Styling
-- shadcn/ui for UI Components
-- XLSX for Excel Integration
-- Recharts for Data Visualization
+### 📊 Data Visualization
+- **Interactive Pie Chart** - Lead distribution by status with distinct colors
+- **Monthly Performance Graph** - Bar & line charts showing leads, value, and conversion rate
+- **Dashboard Metrics** - Total leads, in-progress, completed, and pipeline value
 
-## Data Storage
+### 💾 Data Storage & Excel Integration
+- **Automatic Excel Saving** - Data saved to local disk in Excel format
+- **File Location**: `C:\Users\[USERNAME]\Documents\WorkPipeline\leads_database.xlsx`
+- **Auto Backup System** - Daily backups in `Documents\WorkPipeline\backups\`
+- **Import/Export** - Import existing Excel files and export for sharing
 
-The application uses a fixed Excel file system for data persistence:
+### 💰 Indian Business Format
+- **Currency**: ₹ (Indian Rupees)
+- **Smart Formatting**: Automatically displays as Cr (Crores) and L (Lakhs)
+  - ₹5,00,00,000 → ₹5.00 Cr
+  - ₹2,50,000 → ₹2.50 L
+- **Time Format**: 12-hour with AM/PM (05 Nov 2025, 06:30:45 PM)
 
-### File Locations
-- **Main Database**: 
-  - Windows: `%APPDATA%\work-pipeline\leads_database.xlsx`
-  - macOS: `~/Library/Preferences/work-pipeline/leads_database.xlsx`
-  - Linux: `~/.local/share/work-pipeline/leads_database.xlsx`
+### 🔒 Data Security
+- **Local Storage Only** - No cloud, no servers, complete privacy
+- **Automatic Backups** - Daily backup files with date stamps
+- **Validation** - Phone number and email validation
 
-### Backup System
-- Automatic backups are created daily
-- Backup Location: `[APP_DATA_PATH]/work-pipeline/backups/`
-- Format: `leads-YYYY-MM-DD.xlsx`
+## 🛠️ Technologies Used
 
-## Getting Started
+### Frontend
+- **React 18.3.1** - UI Framework
+- **TypeScript** - Type safety
+- **Vite 5.4.19** - Build tool & dev server
+- **Tailwind CSS** - Styling
 
-1. Clone the repository:
-   ```sh
+### Desktop App
+- **Electron 28.3.3** - Cross-platform desktop app framework
+- **electron-builder** - Installer creation
+
+### Data & Visualization
+- **XLSX** - Excel file handling
+- **Recharts** - Charts and graphs
+- **file-saver** - File download functionality
+
+### UI Components
+- **Radix UI** - Accessible component primitives
+- **Lucide React** - Icon library
+- **shadcn/ui** - Pre-built components
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js** (v16 or higher)
+- **npm** or **yarn**
+- **Windows OS** (for Electron app)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
    git clone https://github.com/Vikas-Maurya-hack/Work_PipeLine.git
+   cd Work_PipeLine
    ```
 
-2. Install dependencies:
-   ```sh
-   cd Work_PipeLine
+2. **Install dependencies**:
+   ```bash
    npm install
    ```
 
-3. Start the development server:
-   ```sh
-   npm run dev
+3. **Run the Desktop App**:
+   
+   **Option A - Double-click the batch file**:
+   ```
+   Start Desktop App.bat
+   ```
+   
+   **Option B - Command line**:
+   ```bash
+   npm run electron:dev
    ```
 
-## Project Structure
+4. **Build for production**:
+   ```bash
+   npm run build
+   npm run electron:build:win
+   ```
+
+## 📁 Project Structure
 
 ```
 work-pipeline/
+├── electron/
+│   ├── main.cjs              # Electron main process
+│   └── preload.cjs           # Preload script for IPC
 ├── src/
-│   ├── components/        # UI Components
-│   │   ├── Dashboard.tsx  # Main dashboard
-│   │   ├── PipelineBoard.tsx
-│   │   └── ui/           # shadcn/ui components
+│   ├── components/
+│   │   ├── Dashboard.tsx     # Dashboard with metrics
+│   │   ├── Header.tsx        # Top navigation & search
+│   │   ├── LeadCard.tsx      # Individual lead card
+│   │   ├── LeadDialog.tsx    # Add/Edit form
+│   │   ├── LeadsPieChart.tsx # Pie chart visualization
+│   │   ├── MonthlyGraph.tsx  # Performance graph
+│   │   ├── PipelineBoard.tsx # Kanban board
+│   │   └── ui/              # Reusable UI components
+│   ├── hooks/
+│   │   └── useLeads.ts      # Lead management logic
 │   ├── lib/
-│   │   ├── excel.ts      # Excel integration
-│   │   └── utils.ts      # Utility functions
-│   ├── hooks/            # Custom React hooks
-│   └── types/            # TypeScript type definitions
-└── public/              # Static assets
+│   │   ├── excel.ts         # Excel import/export
+│   │   ├── storage.ts       # Data persistence
+│   │   └── utils.ts         # Utility functions
+│   ├── pages/
+│   │   ├── Index.tsx        # Main page
+│   │   └── NotFound.tsx     # 404 page
+│   └── types/
+│       └── lead.ts          # TypeScript types
+├── public/
+│   ├── bg.jpg               # Background image
+│   └── robots.txt
+├── Start Desktop App.bat     # Windows launcher
+├── package.json
+└── README.md
 ```
 
-## Data Management
+## 📊 Data Structure
 
-### Excel Integration
-- Automatic saving to fixed location
-- Daily backups
-- Data validation on import/export
-- Template generation for new data
+### Lead Object
+```typescript
+{
+  id: string,              // Unique identifier
+  title: string,           // Project/Lead title
+  client: string,          // Client name
+  value: number,           // Deal value in ₹
+  date: string,            // Date & time (ISO format)
+  status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'won',
+  priority: 'high' | 'medium' | 'low',
+  description?: string,    // Optional description
+  email?: string,          // Optional email
+  phone: string,           // Required phone number
+  createdAt: string,       // Creation timestamp
+  updatedAt: string        // Last update timestamp
+}
+```
 
-### Required Data Fields
-- ID (string)
-- Title (string)
-- Client (string)
-- Value (number)
-- Date (date)
-- Status (enum: new, contacted, qualified, proposal, won)
-- Priority (enum: high, medium, low)
-- Description (string, optional)
-- Email (string, optional)
-- Phone (string, optional)
-- Created At (date)
-- Updated At (date)
+## 🎨 UI Features
 
-## Development
+### Form Validation
+- ✅ Required fields marked with asterisk (*)
+- ✅ Phone number validation (10-15 digits, +91 format supported)
+- ✅ Email validation (proper format check)
+- ✅ Date & time picker with Indian format
+- ✅ Smart currency input with preview
 
-### Running Locally
+### Color Coding
+- 🔵 **New** - Blue
+- 🔷 **Contacted** - Cyan
+- 🟠 **Qualified** - Orange
+- 🟣 **Proposal** - Purple
+- 🟢 **Won** - Green
 
-1. Install dependencies:
-   ```sh
-   npm install
-   ```
+### Priority Badges
+- 🔴 **High** - Red badge
+- 🟡 **Medium** - Gray badge
+- 🟢 **Low** - Gray badge
 
-2. Start development server:
-   ```sh
-   npm run dev
-   ```
+## 💻 Development
 
-3. Build for production:
-   ```sh
+### Running in Development Mode
+```bash
+npm run dev          # Web version (localhost:8080)
+npm run electron:dev # Desktop app with hot reload
+```
+
+### Building
+```bash
+npm run build                # Build web assets
+npm run electron:build:win   # Build Windows installer (.exe)
+```
+
+### Testing
+- Manual testing with sample leads
+- Excel import/export validation
+- Cross-browser compatibility (Chrome, Edge)
+
+## 📦 Deployment
+
+### Creating Windows Installer
+1. Build the app:
+   ```bash
    npm run build
+   npm run electron:build:win
    ```
 
-### Updating GitHub Repository
+2. Installer will be in `dist-electron/` folder
 
-1. Stage your changes:
-   ```sh
-   git add .
-   ```
+3. Share the `.exe` file for one-click installation
 
-2. Commit changes:
-   ```sh
-   git commit -m "Your commit message"
-   ```
+## 🔧 Configuration
 
-3. Push to GitHub:
-   ```sh
-   git push origin master
-   ```
+### Data Storage Location
+Default: `C:\Users\[USERNAME]\Documents\WorkPipeline\`
 
-## Contributing
+To change location, edit `electron/main.cjs`:
+```javascript
+const dataFolder = path.join(app.getPath('documents'), 'WorkPipeline');
+```
+
+### Port Configuration
+Default port: `8080`
+
+To change, edit `vite.config.ts`:
+```typescript
+server: {
+  port: 8080
+}
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how:
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
+2. Create a feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit changes: `git commit -m 'Add some AmazingFeature'`
+4. Push to branch: `git push origin feature/AmazingFeature`
 5. Open a Pull Request
 
-## License
+## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details
+This project is licensed under the MIT License.
+
+## 👤 Author
+
+**Vikas Maurya**
+- GitHub: [@Vikas-Maurya-hack](https://github.com/Vikas-Maurya-hack)
+
+## 🙏 Acknowledgments
+
+- Built with React and Electron
+- UI components from shadcn/ui
+- Icons from Lucide React
+- Charts powered by Recharts
+
+---
+
+Made with ❤️ in India 🇮🇳

@@ -35,9 +35,10 @@ export const MonthlyGraph = ({ leads }: MonthlyGraphProps) => {
   // Calculate conversion rates and format values
   Object.values(monthlyData).forEach((month: any) => {
     month.conversionRate = month.totalLeads > 0 
-      ? (month.wonDeals / month.totalLeads) * 100 
+      ? Math.round((month.wonDeals / month.totalLeads) * 100)
       : 0;
-    month.totalValue = Math.round(month.totalValue / 1000); // Convert to K
+    // Convert to Lakhs for Indian format
+    month.totalValue = Math.round(month.totalValue / 100000); // Convert to Lakhs
   });
 
   const data = Object.values(monthlyData).sort((a: any, b: any) => {
@@ -52,7 +53,7 @@ export const MonthlyGraph = ({ leads }: MonthlyGraphProps) => {
       theme: { light: "#3b82f6", dark: "#3b82f6" }
     },
     totalValue: {
-      label: "Value (K)",
+      label: "Value (₹ Lakhs)",
       theme: { light: "#10b981", dark: "#10b981" }
     },
     conversionRate: {
@@ -65,7 +66,7 @@ export const MonthlyGraph = ({ leads }: MonthlyGraphProps) => {
     <Card className="p-6">
       <h3 className="text-xl font-bold mb-4">Monthly Performance</h3>
       <div className="h-[300px]">
-        <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -74,17 +75,17 @@ export const MonthlyGraph = ({ leads }: MonthlyGraphProps) => {
             <ChartTooltip content={<ChartTooltipContent />} />
             <Legend />
             <Bar yAxisId="left" dataKey="totalLeads" fill="#3b82f6" name="Total Leads" />
-            <Bar yAxisId="left" dataKey="totalValue" fill="#10b981" name="Value (K)" />
+            <Bar yAxisId="left" dataKey="totalValue" fill="#10b981" name="Value (₹L)" />
             <Line 
               yAxisId="right" 
               type="monotone" 
               dataKey="conversionRate" 
               stroke="#f59e0b" 
               strokeWidth={2}
-              name="Conversion Rate %"
+              name="Conversion %"
             />
           </ComposedChart>
-        </ChartContainer>
+        </ResponsiveContainer>
       </div>
     </Card>
   );

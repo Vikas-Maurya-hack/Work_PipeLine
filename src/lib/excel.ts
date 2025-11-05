@@ -1,7 +1,6 @@
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { Lead, LeadStatus, LeadPriority } from '@/types/lead';
-import { toast } from 'sonner';
 
 // NOTE: This module is browser-safe. It does not use Node APIs.
 // Excel files are downloaded to the user's machine. Imports use a File from an <input> element.
@@ -97,10 +96,10 @@ export const exportToExcel = async (leads: Lead[], createCopy: boolean = false) 
       ? `leads-export-${new Date().toISOString().split('T')[0]}.xlsx`
       : 'leads_database.xlsx';
     saveAs(blob, filename);
-    toast.success('Excel file downloaded');
+    console.log('Excel file downloaded');
   } catch (error) {
     console.error('Failed to generate Excel file:', error);
-    toast.error('Failed to generate Excel file');
+    alert('Failed to generate Excel file');
   }
 };
 
@@ -120,7 +119,7 @@ export const importFromExcel = async (file: File): Promise<Lead[]> => {
         const missing = REQUIRED_COLUMNS.filter(c => !c.optional).filter(c => !headers.includes(c.key));
         if (missing.length) {
           const msg = `Missing required columns: ${missing.map(m => m.key).join(', ')}`;
-          toast.error(msg);
+          alert(msg);
           return reject(new Error(msg));
         }
 
@@ -158,22 +157,22 @@ export const importFromExcel = async (file: File): Promise<Lead[]> => {
         });
 
         if (validationErrors.length) {
-          validationErrors.forEach(err => toast.error(err));
+          console.error('Validation errors:', validationErrors);
           if (!validLeads.length) return reject(new Error('No valid leads found in the file'));
-          toast.warning(`Imported ${validLeads.length} leads with ${validationErrors.length} errors`);
+          alert(`Imported ${validLeads.length} leads with ${validationErrors.length} errors`);
         } else {
-          toast.success(`Successfully imported ${validLeads.length} leads`);
+          console.log(`Successfully imported ${validLeads.length} leads`);
         }
 
         resolve(validLeads);
       } catch (err) {
         console.error('Failed to parse Excel:', err);
-        toast.error('Failed to parse Excel file');
+        alert('Failed to parse Excel file');
         reject(err);
       }
     };
     reader.onerror = () => {
-      toast.error('Failed to read file');
+      alert('Failed to read file');
       reject(new Error('Failed to read file'));
     };
     reader.readAsArrayBuffer(file);
@@ -208,5 +207,5 @@ export const downloadTemplate = () => {
   const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   saveAs(data, 'leads-template.xlsx');
   
-  toast.success('Template downloaded successfully');
+  console.log('Template downloaded successfully');
 };

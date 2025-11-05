@@ -13,13 +13,15 @@ const stages: Array<{ id: LeadStatus; label: string; color: string }> = [
 interface PipelineBoardProps {
   leads: Lead[];
   onDeleteLead: (id: string) => void;
+  onEditLead: (lead: Lead) => void;
   onUpdateStatus: (id: string, status: LeadStatus) => void;
   searchQuery?: string;
 }
 
 export const PipelineBoard = ({ 
   leads = [], 
-  onDeleteLead, 
+  onDeleteLead,
+  onEditLead,
   onUpdateStatus,
   searchQuery,
 }: PipelineBoardProps) => {
@@ -54,7 +56,7 @@ export const PipelineBoard = ({
                     e.dataTransfer.setData("leadId", lead.id);
                   }}
                 >
-                  <LeadCard lead={lead} onDelete={onDeleteLead} searchQuery={searchQuery} />
+                  <LeadCard lead={lead} onDelete={onDeleteLead} onEdit={onEditLead} searchQuery={searchQuery} />
                 </div>
               ))}
             </div>

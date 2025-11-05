@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,22 +22,75 @@ import { Lead, LeadPriority, LeadStatus } from "@/types/lead";
 interface LeadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (lead: Omit<Lead, "id">) => void;
+  onSubmit: (lead: Omit<Lead, "id" | "createdAt" | "updatedAt">) => void;
   lead?: Lead;
+  mode?: 'add' | 'edit';
 }
 
-export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogProps) => {
-  const [formData, setFormData] = useState<Omit<Lead, "id">>({
-    title: lead?.title || "",
-    client: lead?.client || "",
-    value: lead?.value || 0,
-    date: lead?.date || new Date().toISOString().split("T")[0],
-    status: lead?.status || "new",
-    priority: lead?.priority || "medium",
-    description: lead?.description || "",
-    email: lead?.email || "",
-    phone: lead?.phone || "",
+export const LeadDialog = ({ open, onOpenChange, onSubmit, lead, mode = 'add' }: LeadDialogProps) => {
+  // Helper function to format datetime for input field
+  const getDateTimeLocalFormat = (date?: string) => {
+    if (!date) {
+      // Return current date and time in format: YYYY-MM-DDTHH:MM
+      const now = new Date();
+      return now.toISOString().slice(0, 16);
+    }
+    // Convert ISO string to datetime-local format
+    return new Date(date).toISOString().slice(0, 16);
+  };
+
+  const [formData, setFormData] = useState<Omit<Lead, "id" | "createdAt" | "updatedAt">>({
+    title: "",
+    client: "",
+    value: 0,
+    date: getDateTimeLocalFormat(),
+    status: "new",
+    priority: "medium",
+    description: "",
+    email: "",
+    phone: "",
   });
+
+  // Update form data when lead changes (for editing)
+  useEffect(() => {
+    if (lead && mode === 'edit') {
+      setFormData({
+        title: lead.title,
+        client: lead.client,
+        value: lead.value,
+        date: getDateTimeLocalFormat(lead.date),
+        status: lead.status,
+        priority: lead.priority,
+        description: lead.description || "",
+        email: lead.email || "",
+        phone: lead.phone || "",
+      });
+    } else if (!lead) {
+      // Reset form when adding new lead
+      setFormData({
+        title: "",
+        client: "",
+        value: 0,
+        date: getDateTimeLocalFormat(),
+        status: "new",
+        priority: "medium",
+        description: "",
+        email: "",
+        phone: "",
+      });
+    }
+  }, [lead, mode]);
+
+  // Format number to Indian currency display
+  const formatIndianNumber = (num: number): string => {
+    if (num >= 10000000) {
+      return `${(num / 10000000).toFixed(2)} Cr`;
+    } else if (num >= 100000) {
+      return `${(num / 100000).toFixed(2)} Lakh`;
+    } else {
+      return num.toLocaleString('en-IN');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,23 +151,37 @@ export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogPro
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="contact@client.com"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                title="Enter a valid email address"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Phone *</Label>
               <Input
                 id="phone"
                 type="tel"
+                required
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+1 (555) 123-4567"
+                onChange={(e) => {
+                  // Allow only numbers, +, spaces, and hyphens
+                  const value = e.target.value.replace(/[^\d+\s-]/g, '');
+                  setFormData({ ...formData, phone: value });
+                }}
+                pattern="^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$"
+                placeholder="+91 98765 43210"
+                title="Enter a valid phone number (e.g., +91 9876543210 or 9876543210)"
+                minLength={10}
+                maxLength={15}
               />
+              <p className="text-xs text-muted-foreground">
+                Format: +91 XXXXXXXXXX or 10-digit number
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="value">Deal Value ($) *</Label>
+              <Label htmlFor="value">Deal Value (₹) *</Label>
               <Input
                 id="value"
                 type="number"
@@ -122,8 +189,13 @@ export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogPro
                 min="0"
                 value={formData.value}
                 onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
-                placeholder="15000"
+                placeholder="5000000"
               />
+              {formData.value > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  ₹{formatIndianNumber(formData.value)}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status *</Label>
@@ -166,10 +238,10 @@ export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date">Date *</Label>
+            <Label htmlFor="date">Date & Time *</Label>
             <Input
               id="date"
-              type="date"
+              type="datetime-local"
               required
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -192,7 +264,7 @@ export const LeadDialog = ({ open, onOpenChange, onSubmit, lead }: LeadDialogPro
               Cancel
             </Button>
             <Button type="submit" className="bg-primary hover:bg-primary-dark">
-              {lead ? "Update Lead" : "Add Lead"}
+              {mode === 'edit' ? "Update Lead" : "Add Lead"}
             </Button>
           </div>
         </form>

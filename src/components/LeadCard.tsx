@@ -7,16 +7,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, User, DollarSign, MoreVertical, Mail, Phone, Trash2 } from "lucide-react";
+import { Calendar, User, IndianRupee, MoreVertical, Mail, Phone, Trash2, Edit } from "lucide-react";
 import { Lead } from "@/types/lead";
 
 interface LeadCardProps {
   lead: Lead;
   onDelete: (id: string) => void;
+  onEdit: (lead: Lead) => void;
   searchQuery?: string;
 }
 
-export const LeadCard = ({ lead, onDelete, searchQuery }: LeadCardProps) => {
+export const LeadCard = ({ lead, onDelete, onEdit, searchQuery }: LeadCardProps) => {
+
+  // Format Indian Rupees with Cr/Lakh
+  const formatIndianCurrency = (value: number): string => {
+    if (value >= 10000000) { // 1 Crore = 1,00,00,000
+      return `${(value / 10000000).toFixed(2)} Cr`;
+    } else if (value >= 100000) { // 1 Lakh = 1,00,000
+      return `${(value / 100000).toFixed(2)} L`;
+    } else {
+      return value.toLocaleString('en-IN');
+    }
+  };
 
   const highlight = (text?: string) => {
     if (!text) return null;
@@ -78,6 +90,10 @@ export const LeadCard = ({ lead, onDelete, searchQuery }: LeadCardProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(lead)}>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"
                 onClick={() => onDelete(lead.id)}
@@ -121,8 +137,8 @@ export const LeadCard = ({ lead, onDelete, searchQuery }: LeadCardProps) => {
 
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1 text-accent font-semibold">
-            <DollarSign className="w-4 h-4" />
-            ${lead.value.toLocaleString()}
+            <IndianRupee className="w-4 h-4" />
+            ₹{formatIndianCurrency(lead.value)}
           </div>
           <Badge
             variant={lead.priority === "high" ? "destructive" : "secondary"}
@@ -134,7 +150,21 @@ export const LeadCard = ({ lead, onDelete, searchQuery }: LeadCardProps) => {
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Calendar className="w-3.5 h-3.5" />
-          {new Date(lead.date).toLocaleDateString()}
+          {(() => {
+            const date = new Date(lead.date);
+            const dateStr = date.toLocaleDateString('en-IN', { 
+              day: '2-digit', 
+              month: 'short', 
+              year: 'numeric'
+            });
+            const timeStr = date.toLocaleTimeString('en-IN', { 
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: true
+            });
+            return `${dateStr}, ${timeStr}`;
+          })()}
         </div>
       </div>
     </Card>

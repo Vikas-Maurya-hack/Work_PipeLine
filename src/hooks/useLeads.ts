@@ -1,32 +1,38 @@
 import { useState, useEffect } from "react";
 import { Lead, LeadStatus } from "@/types/lead";
 import { loadLeads, saveLeads } from "@/lib/storage";
-import { exportToExcel } from "@/lib/excel";
-import { toast } from "sonner";
 
 export const useLeads = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setLeads(loadLeads());
+    // Load leads from storage (async)
+    const initializeLeads = async () => {
+      try {
+        const loadedLeads = await loadLeads();
+        setLeads(loadedLeads);
+      } catch (error) {
+        console.error('Failed to load leads:', error);
+        alert('Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initializeLeads();
   }, []);
 
   useEffect(() => {
-    if (leads.length > 0) {
-      saveLeads(leads);
-      // Check for auto-backup
-      const lastBackup = localStorage.getItem('lastBackupDate');
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Create backup if we haven't backed up today
-      if (lastBackup !== today) {
-        exportToExcel(leads, true);
-        localStorage.setItem('lastBackupDate', today);
-        toast.success('Daily backup created successfully');
-      }
+    // Save leads whenever they change (async)
+    if (!isLoading && leads.length >= 0) {
+      saveLeads(leads).catch((error) => {
+        console.error('Failed to save leads:', error);
+        alert('Failed to save data');
+      });
     }
-  }, [leads]);
+  }, [leads, isLoading]);
 
   const addLead = (lead: Omit<Lead, "id" | "createdAt" | "updatedAt">) => {
     const now = new Date().toISOString();
@@ -37,7 +43,7 @@ export const useLeads = () => {
       updatedAt: now,
     };
     setLeads((prev) => [newLead, ...prev]);
-    toast.success("Lead added successfully!");
+    alert("Lead added successfully!");
     return newLead;
   };
 
@@ -45,12 +51,12 @@ export const useLeads = () => {
     setLeads((prev) =>
       prev.map((lead) => (lead.id === id ? { ...lead, ...updates, updatedAt: new Date().toISOString() } : lead))
     );
-    toast.success("Lead updated!");
+    alert("Lead updated!");
   };
 
   const deleteLead = (id: string) => {
     setLeads((prev) => prev.filter((lead) => lead.id !== id));
-    toast.success("Lead deleted!");
+    alert("Lead deleted!");
   };
 
   const updateLeadStatus = (id: string, status: LeadStatus) => {

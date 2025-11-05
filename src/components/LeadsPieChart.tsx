@@ -23,8 +23,8 @@ export const LeadsPieChart = ({ leads }: LeadsPieChartProps) => {
 
   const COLORS = {
     "New": "#3b82f6",      // blue
-    "Contacted": "#10b981", // green
-    "Qualified": "#f59e0b", // amber
+    "Contacted": "#06b6d4", // cyan
+    "Qualified": "#f59e0b", // amber/orange
     "Proposal": "#8b5cf6",  // purple
     "Won": "#10b981"       // green
   };
@@ -55,15 +55,25 @@ export const LeadsPieChart = ({ leads }: LeadsPieChartProps) => {
   const totalLeads = leads.length;
   const totalValue = leads.reduce((sum, lead) => sum + lead.value, 0);
 
+  const formatValue = (value: number): string => {
+    if (value >= 10000000) {
+      return `₹${(value / 10000000).toFixed(2)} Cr`;
+    } else if (value >= 100000) {
+      return `₹${(value / 100000).toFixed(2)} L`;
+    } else {
+      return `₹${value.toLocaleString('en-IN')}`;
+    }
+  };
+
   return (
     <Card className="p-6">
       <h3 className="text-xl font-bold mb-4">Lead Distribution</h3>
       <div className="text-sm text-muted-foreground mb-4">
         <p>Total Leads: {totalLeads}</p>
-        <p>Total Pipeline Value: ${(totalValue / 1000).toFixed(0)}K</p>
+        <p>Total Pipeline Value: {formatValue(totalValue)}</p>
       </div>
       <div className="h-[300px]">
-        <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
@@ -74,7 +84,7 @@ export const LeadsPieChart = ({ leads }: LeadsPieChartProps) => {
               fill="#8884d8"
               paddingAngle={2}
               dataKey="value"
-              label={({ name, value }) => `${name} (${value})`}
+              label={({ name, value }) => value > 0 ? `${name} (${value})` : ''}
             >
               {data.map((entry, index) => (
                 <Cell 
@@ -86,7 +96,7 @@ export const LeadsPieChart = ({ leads }: LeadsPieChartProps) => {
             <Legend />
             <ChartTooltip content={<ChartTooltipContent />} />
           </PieChart>
-        </ChartContainer>
+        </ResponsiveContainer>
       </div>
     </Card>
   );

@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, Users, CheckCircle2, Clock, DollarSign } from "lucide-react";
+import { TrendingUp, Users, CheckCircle2, Clock, IndianRupee } from "lucide-react";
 import { Lead } from "@/types/lead";
 import { LeadsPieChart } from "./LeadsPieChart";
 import { MonthlyGraph } from "./MonthlyGraph";
@@ -15,11 +15,22 @@ export const Dashboard = ({ leads = [] }: DashboardProps) => {
   const totalValue = leads.reduce((sum, lead) => sum + lead.value, 0);
   const conversionRate = totalLeads > 0 ? Math.round((completed / totalLeads) * 100) : 0;
 
+  // Format Indian currency
+  const formatValue = (value: number): string => {
+    if (value >= 10000000) {
+      return `₹${(value / 10000000).toFixed(2)} Cr`;
+    } else if (value >= 100000) {
+      return `₹${(value / 100000).toFixed(2)} L`;
+    } else {
+      return `₹${value.toLocaleString('en-IN')}`;
+    }
+  };
+
   const stats = [
     { label: "Total Leads", value: totalLeads.toString(), icon: Users, color: "primary" },
     { label: "In Progress", value: inProgress.toString(), icon: Clock, color: "warning" },
     { label: "Completed", value: completed.toString(), icon: CheckCircle2, color: "success" },
-    { label: "Pipeline Value", value: `$${(totalValue / 1000).toFixed(0)}K`, icon: DollarSign, color: "primary" },
+    { label: "Pipeline Value", value: formatValue(totalValue), icon: IndianRupee, color: "primary" },
   ];
   return (
     <div className="grid gap-6">

@@ -4,18 +4,42 @@ import { Dashboard } from "@/components/Dashboard";
 import { PipelineBoard } from "@/components/PipelineBoard";
 import { LeadDialog } from "@/components/LeadDialog";
 import { useLeads } from "@/hooks/useLeads";
+import { Lead } from "@/types/lead";
 
 const Index = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingLead, setEditingLead] = useState<Lead | undefined>(undefined);
   const {
     leads,
     allLeads,
     searchQuery,
     setSearchQuery,
     addLead,
+    updateLead,
     deleteLead,
     updateLeadStatus,
   } = useLeads();
+
+  const handleEditLead = (lead: Lead) => {
+    setEditingLead(lead);
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmitLead = (leadData: Omit<Lead, "id" | "createdAt" | "updatedAt">) => {
+    if (editingLead) {
+      updateLead(editingLead.id, leadData);
+      setEditingLead(undefined);
+    } else {
+      addLead(leadData);
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setEditingLead(undefined);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-top bg-fixed">
@@ -43,6 +67,7 @@ const Index = () => {
         <PipelineBoard
           leads={leads}
           onDeleteLead={deleteLead}
+          onEditLead={handleEditLead}
           onUpdateStatus={updateLeadStatus}
           searchQuery={searchQuery}
         />
@@ -50,8 +75,10 @@ const Index = () => {
 
       <LeadDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={addLead}
+        onOpenChange={handleDialogClose}
+        onSubmit={handleSubmitLead}
+        lead={editingLead}
+        mode={editingLead ? 'edit' : 'add'}
       />
       </div>
     </div>
