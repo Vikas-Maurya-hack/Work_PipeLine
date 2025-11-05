@@ -21,7 +21,7 @@ export const Header = ({ onAddLead, searchQuery, onSearchChange, leads, onImport
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden">
-              <img src="/images/riyas-icon.png" alt="Riyas" className="w-full h-full object-cover" />
+              <img src="./images/riyas-icon.png" alt="Riyas" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Riyas-Space</h1>

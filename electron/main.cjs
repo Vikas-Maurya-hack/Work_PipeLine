@@ -29,21 +29,16 @@ function createWindow() {
 
   // In development, load from Vite dev server
   // In production, load from built files
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = !app.isPackaged;
   
   if (isDev) {
     mainWindow.loadURL('http://localhost:8080');
     mainWindow.webContents.openDevTools();
   } else {
-    // Build the correct path to index.html
-    const distPath = path.resolve(__dirname, '..', 'dist', 'index.html');
-    
-    console.log('App path:', app.getAppPath());
-    console.log('__dirname:', __dirname);
-    console.log('Loading from:', distPath);
-    console.log('File exists:', fs.existsSync(distPath));
-    
-    mainWindow.loadFile(distPath);
+    // In production, load from the packaged files
+    const appPath = app.getAppPath();
+    const indexPath = path.join(appPath, 'dist', 'index.html');
+    mainWindow.loadFile(indexPath);
   }
 
   mainWindow.on('closed', () => {
